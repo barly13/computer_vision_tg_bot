@@ -1,0 +1,41 @@
+from enum import Enum
+
+
+class Emoji(Enum):
+    Error = '❌'
+    Success = '✅'
+    Warning = '⚠️'
+    FourAndHalfPM = '🕟'
+    SixPM = '🕕'
+    TwoPM = '🕑'
+    MainMenu = '🏠'
+    ReportMenu = '🧾'
+    ShowText = '👁'
+    MoreEmoji = '💬'
+    Start = '▶️'
+    Stop = '⏸️'
+    EditText = '✏️'
+    Note = '📝'
+    TechnicalSpecification = '📄'
+    New = '🆕'
+    RecordOn = '🔴'
+    RecordOff = '⚪'
+    Delete = '🗑️'
+    Cancel = '❎'
+    Picture = '🖼'
+    RobotEmoji = '🤖'
+    SicknessEmoji = '😷'
+    VacationEmoji = '🌴'
+    BusinessTripEmoji = '💼'
+    EmployeeEmoji = '🧑‍💻'
+    MakerEmoji = '👷🏼‍♂️'
+    PenEmoji = '🖊️'
+    WrenchEmoji = '🔧'
+    CalendarEmoji = '📅'
+    PeriodEmoji = '🗓'
+    RightArrowEmoji = '➡️'
+    DownArrowEmoji = '⬇️'
+    CheckMarkEmoji = '📌'
+
+    def __str__(self):
+        return self.value
