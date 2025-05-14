@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from tg_bot import start_bot
 
 
 async def main():

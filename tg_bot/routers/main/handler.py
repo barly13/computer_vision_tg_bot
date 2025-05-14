@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from keyboard import generate_inline_menu_kb
+from .keyboard import generate_inline_menu_kb
 
 base_main_router = Router()
 
