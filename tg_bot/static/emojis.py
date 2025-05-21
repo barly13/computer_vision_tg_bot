@@ -13,6 +13,8 @@ class Emoji(Enum):
     Question = '❓'
     Settings = '⚙️'
     Refresh = '🔄'
+    Statistics = '📊'
+    Flask = '🧪'
     Stop = '⏸️'
     EditText = '✏️'
     ExperimentHistory = '📝'
