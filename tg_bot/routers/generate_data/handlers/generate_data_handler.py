@@ -16,7 +16,7 @@ async def generate_data_handler(callback: CallbackQuery, state: FSMContext):
 
     patterns_path = os.path.join(os.getcwd(), 'tg_bot', 'static', 'generate_patterns')
 
-    images_bytes = await image_generator.generate(patterns_path)
+    images_bytes, _ = await image_generator.generate(patterns_path)
 
     media_group = []
 
