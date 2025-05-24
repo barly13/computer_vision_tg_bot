@@ -11,19 +11,24 @@ from typing import Tuple, Dict, List
 
 
 class ImageGenerator:
-    def __init__(self, image_size: Tuple[int, int] = (400, 600), num_images: int = 3, elements_per_image: int = 100):
+    def __init__(self, image_size: Tuple[int, int] = (400, 600), num_images: int = 3, elements_per_image: int = 100, seeds: List[int] = []):
+        self.__seeds = seeds
+        if len(seeds) not in (0, num_images):
+            raise RuntimeError('seeds must be empty or same size as images num')
         self.__image_size = image_size
         self.__num_images = num_images
         self.__elements_per_image = elements_per_image
         self.images = []
-
+        self.bboxes = []
     async def generate(self, patterns_path: str) -> List[BytesIO]:
         pattern_files = self.__load_patterns(patterns_path)
 
-        for _ in range(self.__num_images):
-            composite = self.__assemble_images(pattern_files)
+        for i in range(self.__num_images):
+            if self.__seeds:
+                random.seed(self.__seeds[i])
+            composite, bboxes = self.__assemble_images(pattern_files)
             self.images.append(composite)
-
+            self.bboxes.append(bboxes)
         images_bytes = []
 
         for image in self.images:
@@ -31,7 +36,7 @@ class ImageGenerator:
             img_bytes = BytesIO(buffer.tobytes())
             images_bytes.append(img_bytes)
 
-        return images_bytes
+        return images_bytes, self.bboxes
 
     @staticmethod
     def __load_patterns(patterns_path: str) -> Dict[str, List[str]]:
@@ -48,16 +53,16 @@ class ImageGenerator:
 
     def __assemble_images(self, pattern_files: Dict[str, List[str]]) -> np.ndarray:
         positions = self.__random_positions()
-
+        bboxes = []
         background = cv2.imread(random.choice(list(pattern_files.values())[0]))
         overlay = cv2.imread(random.choice(list(pattern_files.values())[1]), cv2.IMREAD_UNCHANGED)
 
         background = cv2.resize(background, self.__image_size, interpolation=cv2.INTER_CUBIC)
 
         for h, w in positions:
-            background = self.__blend_element(background, overlay, (h, w))
-
-        return background
+            background, bbox = self.__blend_element(background, overlay, (h, w))
+            bboxes.append(bbox)
+        return background, bboxes
 
     def __random_positions(self) -> List[Tuple[int, int]]:
         h_max, w_max = self.__image_size
@@ -99,7 +104,7 @@ class ImageGenerator:
             base_slice[:, :, c] = (1 - alpha) * base_slice[:, :, c] + alpha * rgb[:, :, c]
 
         base[top_left[0]:h_end, top_left[1]:w_end] = base_slice
-        return base
+        return base, (top_left[1] + crop_w / 2, top_left[0] + crop_h / 2, crop_w, crop_h)
 
     @staticmethod
     def __apply_rotation(img: np.ndarray, h: int, w: int) -> Tuple[np.ndarray, int, int]:
@@ -116,3 +121,42 @@ class ImageGenerator:
 
         rotated = cv2.warpAffine(img, matrix, (new_w, new_h))
         return rotated, new_h, new_w
+
+if __name__ == '__main__':
+    import time
+    import yaml
+    import asyncio
+    from pathlib import Path
+
+    config_path = os.path.join(os.getcwd(), 'tg_bot', 'routers', 'generate_data', 'backend', 'generate_dataset_config.yml')
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+
+    output_dir = Path(config['output_dir'])
+    os.makedirs(output_dir / 'images', exist_ok=True)
+    os.makedirs(output_dir / 'bboxes', exist_ok=True)
+
+    seeds = []
+    if 'seed' in config.keys():
+        random.seed(config['seed'])
+        for _ in range(config['imgs_num']):
+            seeds.append(random.uniform(0.0, 1.0))
+
+    patterns_path = os.path.join(os.getcwd(), 'tg_bot', 'static', 'generate_patterns')
+    generator = ImageGenerator(image_size=config['img_size'], num_images=config['imgs_num'], elements_per_image=config['elements_per_image'], seeds=seeds)
+    images, bboxes = asyncio.get_event_loop().run_until_complete(generator.generate(patterns_path))
+    for image, img_bboxes in zip(images, bboxes):
+        timestamp_ms = int(time.time() * 1000)
+
+        image_bytes = image.getvalue()
+        image_np = np.frombuffer(image_bytes, dtype=np.uint8)
+        image_cv2 = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
+        if image_cv2 is None:
+            raise ValueError('Не удалось декодировать изображение!')
+        img_filepath = str(output_dir / 'images' /f'{timestamp_ms}.png')
+        cv2.imwrite(img_filepath, image_cv2)
+
+        bboxes_filepath = str(output_dir / 'bboxes' / f'{timestamp_ms}.txt')
+        with open(bboxes_filepath, 'w') as f:
+            for bbox in img_bboxes:
+                f.write(' '.join(map(str, bbox)) + '\n')
