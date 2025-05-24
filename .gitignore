@@ -1,3 +1,4 @@
 *.png
 *.jpg
 datasets/
+*__pycache__
