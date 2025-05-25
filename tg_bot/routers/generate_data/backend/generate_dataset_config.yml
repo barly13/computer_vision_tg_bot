@@ -1,5 +1,5 @@
-img_size: [500, 500]
-imgs_num: 2
-elements_per_image: 50
-output_dir: 'datasets\generated_datasets'
-#seed: 1
+img_size: [1944, 1383]
+imgs_num: [2, 3]
+elements_per_image: [10, 100]
+output_dir: 'datasets\generated_datasets\train'
+seeds: [1, 2]
