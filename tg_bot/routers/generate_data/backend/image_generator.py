@@ -7,7 +7,7 @@ import numpy as np
 from natsort import natsorted
 from io import BytesIO
 
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict, List, Any
 
 
 class ImageGenerator:
@@ -20,7 +20,8 @@ class ImageGenerator:
         self.__elements_per_image = elements_per_image
         self.images = []
         self.bboxes = []
-    async def generate(self, patterns_path: str) -> List[BytesIO]:
+
+    async def generate(self, patterns_path: str) -> Tuple[List[BytesIO], List[Any]]:
         pattern_files = self.__load_patterns(patterns_path)
 
         for i in range(self.__num_images):
@@ -51,7 +52,7 @@ class ImageGenerator:
 
         return categorized
 
-    def __assemble_images(self, pattern_files: Dict[str, List[str]]) -> np.ndarray:
+    def __assemble_images(self, pattern_files: Dict[str, List[str]]) -> Tuple[np.ndarray, List[Any]]:
         positions = self.__random_positions()
         bboxes = []
         background = cv2.imread(random.choice(list(pattern_files.values())[0]))

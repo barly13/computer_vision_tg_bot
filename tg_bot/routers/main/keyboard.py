@@ -21,3 +21,12 @@ def generate_inline_menu_kb():
                                                  callback_data='help'))
 
     return main_menu_inline_kb.as_markup()
+
+
+def generate_main_menu_button_inline_kb():
+    main_menu_button_inline_kb = InlineKeyboardBuilder()
+
+    main_menu_button_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.MainMenu} Главное меню',
+                                                        callback_data='main_menu'))
+
+    return main_menu_button_inline_kb.as_markup()
