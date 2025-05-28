@@ -1,0 +1,18 @@
+common:
+  seed: 1
+  input-dir: datasets/generated_datasets/train
+  output-dir: datasets/generated_datasets/train
+  apply-y-flip: 1
+  augmentation-part: 0.3
+blur: 
+  enable: 1
+  seed: 2
+  kernel-size-min: 2
+  kernel-size-max: 13
+noise:
+  enable: 1
+  seed: 3
+  mean-min: 0
+  mean-max: 0
+  std-min: 1
+  std-max: 22
