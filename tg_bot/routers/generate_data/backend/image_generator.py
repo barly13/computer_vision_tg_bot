@@ -11,7 +11,8 @@ from typing import Tuple, Dict, List, Any
 
 
 class ImageGenerator:
-    def __init__(self, image_size: Tuple[int, int] = (600, 400), num_images: int = 3, elements_per_image: int = 100, seeds: List[int] = []):
+    def __init__(self, image_size: Tuple[int, int] = (1984, 1408), num_images: int = 3,
+                 elements_per_image: int = 100, seeds: List[int] = []):
         self.__seeds = seeds
         if len(seeds) not in (0, num_images):
             raise RuntimeError('seeds must be empty or same size as images num')

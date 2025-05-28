@@ -4,19 +4,20 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 from .keyboard import generate_inline_menu_kb, generate_main_menu_button_inline_kb
+from ...static import Emoji
 
 main_router = Router()
 
 
 @main_router.message(Command('start'))
 async def main_menu_handler(message: Message, state: FSMContext):
-    await message.answer(f'Главное меню', reply_markup=generate_inline_menu_kb())
+    await message.answer(f'{Emoji.MainMenu} Главное меню', reply_markup=generate_inline_menu_kb())
     await state.clear()
 
 
 @main_router.callback_query(F.data == 'main_menu')
 async def main_menu_second_handler(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(f'Главное меню', reply_markup=generate_inline_menu_kb())
+    await callback.message.answer(f'{Emoji.MainMenu} Главное меню', reply_markup=generate_inline_menu_kb())
     await state.clear()
 
 

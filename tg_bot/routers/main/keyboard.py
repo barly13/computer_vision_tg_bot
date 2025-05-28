@@ -7,8 +7,8 @@ from tg_bot.static import Emoji
 def generate_inline_menu_kb():
     main_menu_inline_kb = InlineKeyboardBuilder()
 
-    main_menu_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.Brain} Выбрать метод анализа',
-                                                 callback_data='choose_analysis_method'))
+    main_menu_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.Brain} Проанализировать изображение',
+                                                 callback_data='analise_image'))
     main_menu_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.ExperimentHistory} История экспериментов',
                                                  callback_data='experiment_history'))
     main_menu_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.Folder} Скачать результаты',
