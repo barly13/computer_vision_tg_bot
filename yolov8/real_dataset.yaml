@@ -1,0 +1,7 @@
+path: /tg_bot/computer_vision_tg_bot-main/datasets/BCCD_Dataset_with_mask
+
+train: train
+val: test
+
+names:
+    0: cell
