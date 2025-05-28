@@ -18,7 +18,7 @@ def add_blur(img, kernel_size):
     return cv2.blur(img, (kernel_size, kernel_size))
 
 if __name__ == '__main__':
-    config_path = Path(os.getcwd()) / 'utils' / 'augmentations_config.yml'
+    config_path = Path(os.getcwd()) / 'utils' / 'augmentations_config.yml' # ?
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
     random.seed()
@@ -28,9 +28,10 @@ if __name__ == '__main__':
 
     in_folder = Path(config['common']['input-dir'])
     out_folder = Path(config['common']['output-dir'])
-    os.makedirs(out_folder, exist_ok=True)
+    os.makedirs(out_folder / 'images', exist_ok=True)
+    os.makedirs(out_folder / 'labels', exist_ok=True)
 
-    files = [f for f in in_folder.iterdir()]
+    files = [f for f in (in_folder / 'images').iterdir()]
     files_num = int(len(files) * config['common']['augmentation-part'])
     files = common_rng.choice(files, files_num)
     for file in files:
@@ -52,6 +53,21 @@ if __name__ == '__main__':
             image = add_noise(image, mean, std)
 
         timestamp_ms = int(time.time() * 1000)
-        out_file = out_folder / f'{file.stem}_mod_{timestamp_ms}.png'
+        out_file = out_folder / 'images' / f'{file.stem}_mod_{timestamp_ms}.jpg'
         cv2.imwrite(str(out_file), image)
+        
+        bboxes =[]
+        with open(in_folder / 'labels' / f'{file.stem}.txt', 'r') as f:
+            Lines = f.readlines()
+            for bbox in Lines:
+                bboxes.append(bbox.strip().split())
+        
+        if config['common']['apply-y-flip']:
+            for bbox in bboxes:
+                bbox[1] = str(1.0 - float(bbox[1]))
+
+        out_file = out_folder / 'labels' / f'{file.stem}_mod_{timestamp_ms}.txt'
+        with open(out_file, 'w') as f:
+            for bbox in bboxes:
+                f.write(' '.join(map(str, bbox)) + '\n')
     
