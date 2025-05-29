@@ -47,7 +47,7 @@ class ImageGenerator:
         for dirpath, _, filenames in os.walk(patterns_path):
             if filenames:
                 label = os.path.normpath(dirpath)
-                categorized[label] = natsorted([
+                categorized[os.path.basename(dirpath)] = natsorted([
                     os.path.join(label, file) for file in filenames
                 ])
 
@@ -56,8 +56,8 @@ class ImageGenerator:
     def __assemble_images(self, pattern_files: Dict[str, List[str]]) -> Tuple[np.ndarray, List[Any]]:
         positions = self.__random_positions()
         bboxes = []
-        background = cv2.imread(random.choice(list(pattern_files.values())[0]))
-        overlay = cv2.imread(random.choice(list(pattern_files.values())[1]), cv2.IMREAD_UNCHANGED)
+        background = cv2.imread(random.choice(pattern_files['background']))
+        overlay = cv2.imread(random.choice(pattern_files['cells']), cv2.IMREAD_UNCHANGED)
         background = cv2.resize(background, self.__image_size, interpolation=cv2.INTER_CUBIC)
 
         for h, w in positions:
@@ -167,7 +167,7 @@ if __name__ == '__main__':
             image_cv2 = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
             if image_cv2 is None:
                 raise ValueError('Не удалось декодировать изображение')
-            img_filepath = str(output_dir / 'images' /f'{timestamp_ms}.png')
+            img_filepath = str(output_dir / 'images' /f'{timestamp_ms}.jpg')
             cv2.imwrite(img_filepath, image_cv2)
 
             bboxes_filepath = str(output_dir / 'labels' / f'{timestamp_ms}.txt')

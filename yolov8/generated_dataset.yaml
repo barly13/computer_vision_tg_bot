@@ -1,0 +1,8 @@
+path: /tg_bot/computer_vision_tg_bot-main/datasets/generated_datasets
+
+train: train
+val: val
+test: test
+
+names:
+    0: cell

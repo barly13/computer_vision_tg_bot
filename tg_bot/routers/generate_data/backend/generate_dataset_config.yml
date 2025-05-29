@@ -1,5 +1,14 @@
-img_size: [1944, 1383]
-imgs_num: [2, 3]
-elements_per_image: [10, 100]
-output_dir: 'datasets\generated_datasets\train'
-seeds: [1, 2]
+img_size: [1952, 1408]
+elements_per_image: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
+imgs_num: [300, 300, 300, 300, 300, 300, 300, 300, 300, 300] #train
+seeds: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100] #train
+output_dir: 'datasets/generated_datasets/train'
+
+# imgs_num: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100] #val
+# seeds: [11, 21, 31, 41, 51, 61, 71, 81, 91, 101] #val
+# output_dir: 'datasets/generated_datasets/val'
+
+# imgs_num: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50] #test
+# seeds: [12, 22, 32, 42, 52, 62, 72, 82, 92, 102] #test
+# output_dir: 'datasets/generated_datasets/test'
