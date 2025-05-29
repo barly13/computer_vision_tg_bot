@@ -5,5 +5,5 @@ import numpy as np
 
 class AnalysisMethodBase(ABC):
     @abstractmethod
-    async def execute(self, image: np.ndarray):
+    def execute(self, image: np.ndarray):
         pass

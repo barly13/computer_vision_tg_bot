@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, BufferedInputFile, InputMediaPhoto, Message
 
+from tg_bot.settings import PATTERNS_PATH
 from tg_bot.static import Emoji
 from ..backend import ImageGenerator
 from ..keyboard import generate_settings_inline_kb, generate_button_and_main_menu_inline_kb
@@ -31,27 +32,28 @@ async def generate_data_handler(callback: CallbackQuery, state: FSMContext):
     image_generator = ImageGenerator(image_size=image_size, num_images=num_images,
                                      elements_per_image=num_elements, seeds=seeds)
 
-    patterns_path = os.path.join(os.getcwd(), 'tg_bot', 'static', 'generate_patterns')
-
-    images_bytes, _ = await image_generator.generate(patterns_path)
+    images_bytes, _ = await image_generator.generate(PATTERNS_PATH)
 
     media_group = []
 
     for index, image in enumerate(images_bytes):
         photo = BufferedInputFile(file=image.getvalue(), filename=f'generated_{index}.png')
-        media_group.append(InputMediaPhoto(media=photo, caption='Generated images:' if index == 0 else ''))
+        media_group.append(InputMediaPhoto(media=photo,
+                                           caption=f'{Emoji.Brain} Сгенерированные изображения:' if index == 0 else ''))
 
     await callback.message.answer_media_group(media_group)
 
 
 @generate_data_router.callback_query(F.data == 'generation_settings')
 async def generation_settings_handler(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(text='Выберите, что хотите настроить:', reply_markup=generate_settings_inline_kb())
+    await callback.message.edit_text(text=f'{Emoji.EditText} Выберите, что хотите настроить:',
+                                     reply_markup=generate_settings_inline_kb())
 
 
 @generate_data_router.callback_query(F.data == 'set_image_size')
 async def set_image_size_handler(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer('Введите размер изображения в формате: ширина,высота (от 100 до 2000)')
+    await callback.message.answer(f'{Emoji.PenEmoji} Введите размер изображения в формате: '
+                                  f'ширина,высота (от 100 до 2000)')
     await state.set_state(GenerationSettingsState.waiting_for_size)
 
 
@@ -70,7 +72,8 @@ async def set_images_size(message: Message, state: FSMContext):
         await message.answer(f'{Emoji.Cancel} Неверный формат или значения вне допустимого диапазона. Пример: 600, 400')
         return
 
-    await message.answer('Что хотите настроить дальше?', reply_markup=generate_settings_inline_kb())
+    await message.answer(f'{Emoji.EditText} Что хотите настроить дальше?',
+                         reply_markup=generate_settings_inline_kb())
 
 
 @generate_data_router.callback_query(F.data == 'set_num_images')
@@ -129,36 +132,32 @@ async def set_seed_handler(callback: CallbackQuery, state: FSMContext):
 
 @generate_data_router.message(GenerationSettingsState.waiting_for_seed)
 async def set_seed(message: Message, state: FSMContext):
-    try:
-        state_data = await state.get_data()
+    state_data = await state.get_data()
 
-        if 'num_images' not in state_data:
-            await message.answer(f'{Emoji.Cancel} Сначала укажите количество изображений.',
-                                 reply_markup=generate_settings_inline_kb())
-            return
-
-        try:
-            seed_list = list(map(int, message.text.strip().split(',')))
-        except ValueError:
-            await message.answer(f'{Emoji.Cancel} Введите только целые числа, разделённые запятыми, '
-                                 f'например: 42 или 1,2,3')
-            return
-
-        if not all(-100000 <= s <= 100000 for s in seed_list):
-            await message.answer(f'{Emoji.Cancel} Каждое число должно быть в диапазоне от -100000 до 100000.')
-            return
-
-        if len(seed_list) != state_data['num_images']:
-            await message.answer(f'{Emoji.Cancel} Вы указали {len(seed_list)} чисел, '
-                                 f'а нужно {state_data['num_images']}.')
-            return
-
-        await state.update_data(seeds=seed_list)
-        await message.answer(f'{Emoji.Success} Seed установлен: {seed_list}')
-
-    except:
-        await message.answer(f'{Emoji.Cancel} Произошла непредвиденная ошибка. Попробуйте снова.')
+    if 'num_images' not in state_data:
+        await message.answer(f'{Emoji.Cancel} Сначала укажите количество изображений.',
+                             reply_markup=generate_settings_inline_kb())
         return
+
+    try:
+        seed_list = list(map(int, message.text.strip().split(',')))
+
+    except ValueError:
+        await message.answer(f'{Emoji.Cancel} Введите только целые числа, разделённые запятыми, '
+                             f'например: 42 или 1,2,3')
+        return
+
+    if not all(-100000 <= s <= 100000 for s in seed_list):
+        await message.answer(f'{Emoji.Cancel} Каждое число должно быть в диапазоне от -100000 до 100000.')
+        return
+
+    if len(seed_list) != state_data['num_images']:
+        await message.answer(f'{Emoji.Cancel} Вы указали {len(seed_list)} чисел, '
+                             f'а нужно {state_data['num_images']}.')
+        return
+
+    await state.update_data(seeds=seed_list)
+    await message.answer(f'{Emoji.Success} Seed установлен: {seed_list}')
 
     await message.answer('Что хотите настроить дальше?', reply_markup=generate_settings_inline_kb())
 

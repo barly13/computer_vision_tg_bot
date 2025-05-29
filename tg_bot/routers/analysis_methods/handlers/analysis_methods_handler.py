@@ -7,8 +7,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery, BufferedInputFile
 
+from ..backend import get_image_to_analise, get_cnn_analysis_result, get_cv_analysis_result
 from ..keyboard import generate_analysis_methods_inline_kb
-from ..backend import cnn_analysis_method, visualise_detection
 from ....static import Emoji
 
 analysis_methods_router = Router()
@@ -32,24 +32,27 @@ async def upload_photo_handler(message: Message, state: FSMContext):
         await message.answer(f'{Emoji.Warning} Сначала выберите опцию анализа изображения.')
         return
 
-    photo = message.photo[-1]
-    file = await message.bot.download(photo.file_id)
+    result = await get_image_to_analise(message)
+    if result.error:
+        await message.answer(f'{Emoji.Cancel} {result.message}')
+        return
 
-    image_data = file.read()
+    image = result.value
 
-    file_array = np.asarray(bytearray(image_data), dtype=np.uint8)
-    image = cv2.imdecode(file_array, cv2.IMREAD_COLOR)
+    cnn_result = await get_cnn_analysis_result(image=image)
+    if cnn_result.error:
+        await message.answer(f'{Emoji.Cancel} {cnn_result.message}')
+        return
 
-    detections = await cnn_analysis_method.execute(image)
-    output_image = visualise_detection(image, detections)
-
-    _, buffer = cv2.imencode('.png', output_image)
-    img_bytes = BytesIO(buffer.tobytes())
+    cv_result = await get_cv_analysis_result(image=image)
+    if cv_result.error:
+        await message.answer(f'{Emoji.Cancel} {cv_result.message}')
+        return
 
     results = {
-        'open_cv_method': image_data,
-        'ml_method': image_data,
-        'cnn_method': img_bytes.getvalue(),
+        'open_cv_method': cv_result.value,
+        'ml_method': '',
+        'cnn_method': cnn_result.value,
     }
 
     await state.update_data(results=results)

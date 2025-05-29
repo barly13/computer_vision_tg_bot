@@ -1,0 +1,1 @@
+from .cnn_analysis_method import cnn_analysis_method
