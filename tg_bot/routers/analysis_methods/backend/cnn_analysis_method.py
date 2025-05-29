@@ -23,7 +23,7 @@ class CNNAnalysisMethod(AnalysisMethodBase):
 
         if dx != 0 or dy != 0:
             input_image = cv2.copyMakeBorder(image, 0, dy, 0, dx, cv2.BORDER_CONSTANT)
-        results = self.model(input_image, imgsz=(input_image.shape[:2]), verbose=False, device=self.device)[0]
+        results = self.model(input_image, imgsz=(input_image.shape[:2]), verbose=False, device=self.device, iou=0.45, conf=0.3)[0]
         if self.device != 'cpu':
             results = results.boxes.data.cpu().detach().numpy()
 
