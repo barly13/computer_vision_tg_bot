@@ -25,9 +25,9 @@ async def generate_data_handler(callback: CallbackQuery, state: FSMContext):
     state_data = await state.get_data()
 
     image_size = state_data.get('image_size', (1984, 1408))
-    num_images = state_data.get('num_images', 3)
+    num_images = state_data.get('num_images', 1)
     num_elements = state_data.get('num_elements', 100)
-    seeds = state_data.get('seeds', [1, 2, 3])
+    seeds = state_data.get('seeds', [])
 
     image_generator = ImageGenerator(image_size=image_size, num_images=num_images,
                                      elements_per_image=num_elements, seeds=seeds)
@@ -166,10 +166,10 @@ async def set_seed(message: Message, state: FSMContext):
 async def save_settings_handler(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await callback.message.answer(f'{Emoji.Save} Настройки сохранены:\n\n'
-                                  f'Размер: {data.get('image_size', '(600, 400)')}\n'
-                                  f'Количество изображений: {data.get('num_images', 3)}\n'
-                                  f'Количество элементов на изображении: {data.get('num_elements', 100)}\n'
-                                  f'Seed: {data.get('seeds', [])}',
+                                  f'Размер: {data.get("image_size", "(1984, 1408)")}\n'
+                                  f'Количество изображений: {data.get("num_images", 1)}\n'
+                                  f'Количество элементов на изображении: {data.get("num_elements", 100)}\n'
+                                  f'Seed: {data.get("seeds", [])}',
                                   reply_markup=generate_button_and_main_menu_inline_kb())
 
 
