@@ -73,7 +73,7 @@ async def image_type_chosen_handler(callback: CallbackQuery, state: FSMContext):
 
     image_size = data.get('image_size', (1984, 1408))
     num_elements = data.get('num_elements', 100)
-    seeds = data.get('seeds', [1, 2, 3])
+    seeds = data.get('seeds', [])
 
     generated_parameters = (
         f'Размер изображения = {image_size[0]}x{image_size[1]}; '

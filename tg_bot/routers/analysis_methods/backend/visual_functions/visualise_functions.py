@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 
-def visualise_detection(image: np.ndarray, detections: np.ndarray | List[np.ndarray],
+def visualise_detection(image: np.ndarray, detections, method: str,
                         color: Tuple[int, int, int] = None) -> np.ndarray:
     if color is None:
         color = (0, 255, 0)
@@ -15,19 +15,15 @@ def visualise_detection(image: np.ndarray, detections: np.ndarray | List[np.ndar
         output_image = cv2.cvtColor(output_image, cv2.COLOR_GRAY2BGR)
 
     for det in detections:
-        if len(det) == 4:
+        if method == 'ml':
+            cv2.drawContours(output_image, [det], -1, color, 2)
+        elif method == 'cnn':
             x1, y1, x2, y2 = map(int, det)
             cv2.rectangle(output_image, (x1, y1), (x2, y2), color, 2)
-
-        elif len(det) == 3:
+        elif method == 'cv':
             x, y, r = map(int, det)
             cv2.circle(output_image, (x, y), r, color, 2)
-
         else:
-            try:
-                if len(det.shape) == 3:
-                    cv2.drawContours(image, [det], -1, color, 2)
-            except:
-                raise ValueError(f"Unknown detection format: {det}")
+            raise ValueError(f"Unknown detection format: {det}")
 
     return output_image

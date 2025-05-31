@@ -58,7 +58,7 @@ async def get_cnn_analysis_result(image) -> Response:
 
         detections = cnn_analysis_method.execute(cnn_image)
         cnn_count = len(detections)
-        output_image = visualise_detection(cnn_image, detections)
+        output_image = visualise_detection(cnn_image, detections, 'cnn')
         _, buffer = cv2.imencode('.png', output_image)
 
         return Response(value={'image': buffer.tobytes(), 'cnn_result': cnn_count})
@@ -74,7 +74,7 @@ async def get_cv_analysis_result(image, cnn_result: int) -> Response:
         cv_method = CVAnalysisMethod()
         detections = cv_method.execute(cv_image)
         cv_count = len(detections)
-        output_image = visualise_detection(cv_image, detections)
+        output_image = visualise_detection(cv_image, detections, 'cv')
         _, buffer = cv2.imencode('.png', output_image)
 
         return Response(value={'image': buffer.tobytes(), 'cnn_result': cnn_result, 'cv_result': cv_count})
@@ -95,7 +95,7 @@ async def get_ml_analysis_result(
         ml_method = MLAnalysisMethod()
         detections = ml_method.execute(ml_image)
         ml_count = len(detections)
-        output_image = visualise_detection(ml_image, detections)
+        output_image = visualise_detection(ml_image, detections, 'ml')
         _, buffer = cv2.imencode('.png', output_image)
 
         if is_generated:
@@ -125,7 +125,7 @@ async def get_ml_analysis_result(
 
         return Response(
             value={
-                'image': ml_image,
+                'image': buffer.tobytes(),
                 'cnn_result': cnn_result,
                 'cv_result': cv_result,
                 'ml_result': ml_count
