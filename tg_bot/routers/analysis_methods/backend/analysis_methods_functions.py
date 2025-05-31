@@ -10,6 +10,7 @@ from database import ExperimentReport
 from tg_bot.dtos import Response
 from .cnn_analysis_method import cnn_analysis_method
 from .cv_analysis_method import CVAnalysisMethod
+from .ml_analysis_method import MLAnalysisMethod
 from .visual_functions import visualise_detection
 from ....settings import  SAVE_PATH
 
@@ -91,7 +92,11 @@ async def get_ml_analysis_result(
 ) -> Response:
     try:
         ml_image = image.copy()
-        ml_result = 0
+        ml_method = MLAnalysisMethod()
+        detections = ml_method.execute(ml_image)
+        ml_count = len(detections)
+        output_image = visualise_detection(ml_image, detections)
+        _, buffer = cv2.imencode('.png', output_image)
 
         if is_generated:
             save_report_to_db(
@@ -99,7 +104,7 @@ async def get_ml_analysis_result(
                 generation_params=generated_parameters,
                 image_path=None,
                 opencv_result=cv_result,
-                ml_result=ml_result,
+                ml_result=ml_count,
                 cnn_result=cnn_result
             )
 
@@ -114,7 +119,7 @@ async def get_ml_analysis_result(
                 generation_params=None,
                 image_path=str(image_path),
                 opencv_result=cv_result,
-                ml_result=ml_result,
+                ml_result=ml_count,
                 cnn_result=cnn_result
             )
 
@@ -123,7 +128,7 @@ async def get_ml_analysis_result(
                 'image': ml_image,
                 'cnn_result': cnn_result,
                 'cv_result': cv_result,
-                'ml_result': ml_result
+                'ml_result': ml_count
             }
         )
 

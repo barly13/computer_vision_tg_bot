@@ -24,6 +24,10 @@ def visualise_detection(image: np.ndarray, detections: np.ndarray | List[np.ndar
             cv2.circle(output_image, (x, y), r, color, 2)
 
         else:
-            raise ValueError(f"Unknown detection format: {det}")
+            try:
+                if len(det.shape) == 3:
+                    cv2.drawContours(image, [det], -1, color, 2)
+            except:
+                raise ValueError(f"Unknown detection format: {det}")
 
     return output_image
