@@ -23,7 +23,7 @@ class MLAnalysisMethod(AnalysisMethodBase):
         
         return np.array(features)
 
-    def count_cells_ml(image, patch_size=16, min_area=400):
+    def count_cells_ml(self, image, patch_size=64, min_area=400):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gray = cv2.medianBlur(gray, 51)
 
