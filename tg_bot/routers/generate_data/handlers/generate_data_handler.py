@@ -27,7 +27,7 @@ async def generate_data_handler(callback: CallbackQuery, state: FSMContext):
     image_size = state_data.get('image_size', (1984, 1408))
     num_images = state_data.get('num_images', 3)
     num_elements = state_data.get('num_elements', 100)
-    seeds = state_data.get('seeds', [])
+    seeds = state_data.get('seeds', [1, 2, 3])
 
     image_generator = ImageGenerator(image_size=image_size, num_images=num_images,
                                      elements_per_image=num_elements, seeds=seeds)

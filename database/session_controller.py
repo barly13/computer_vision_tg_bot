@@ -11,7 +11,7 @@ class SessionController:
         try:
             self.engine = create_engine(f'sqlite:///{path}')
             self.session = sessionmaker(bind=self.engine)()
-            return self.session
+            return self.engine
 
         except Exception as exp:
             raise Exception(f'Не удалось изменить сессию. Укажите правильный путь до файла: {exp}')

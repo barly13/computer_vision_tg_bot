@@ -28,7 +28,6 @@ class Emoji(Enum):
     Brain = '🧠'
     Delete = '🗑️'
     Cancel = '❎'
-    Picture = '🖼'
     RobotEmoji = '🤖'
     SicknessEmoji = '😷'
     VacationEmoji = '🌴'

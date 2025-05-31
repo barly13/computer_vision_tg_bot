@@ -9,8 +9,6 @@ def generate_inline_menu_kb():
 
     main_menu_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.Brain} Проанализировать изображение',
                                                  callback_data='analise_image'))
-    main_menu_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.ExperimentHistory} История экспериментов',
-                                                 callback_data='experiment_history'))
     main_menu_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.Folder} Скачать результаты',
                                                  callback_data='download_results'))
     main_menu_inline_kb.row(InlineKeyboardButton(text=f'{Emoji.Settings} Настройки генерации',

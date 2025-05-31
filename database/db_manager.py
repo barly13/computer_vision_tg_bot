@@ -32,3 +32,4 @@ class DBManager:
             return False
     
 
+db_manager = DBManager()

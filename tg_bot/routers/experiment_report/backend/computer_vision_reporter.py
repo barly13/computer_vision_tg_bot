@@ -2,6 +2,8 @@ import os
 import xlwt
 from io import BytesIO
 
+from database import ExperimentReport
+
 
 class ComputerVisionReporter:
     def __init__(self):
@@ -19,23 +21,23 @@ class ComputerVisionReporter:
             {
                 'header': 'Номер эксперимента',
                 'colspan': 1,
-                'data_func': lambda data: data.get('id')
+                'data_func': lambda data: data.id
             },
             {
                 'header': 'Дата',
                 'colspan': 1,
-                'data_func': lambda data: data.get('date')
+                'data_func': lambda data: data.date.strftime("%d.%m.%Y %H:%M")
             },
             {
                 'header': 'Данные',
                 'sub_columns': [
                     {
                         'header': 'Путь к файлу (реальные данные)',
-                        'data_func': lambda data: data.get('real_path')
+                        'data_func': lambda data: data.image_path if data.image_path else ''
                     },
                     {
                         'header': 'Параметры генерации (сгенерированные данные)',
-                        'data_func': lambda data: data.get('gen_params')
+                        'data_func': lambda data: data.generation_params if data.generation_params else ''
                     }
                 ]
             },
@@ -43,16 +45,16 @@ class ComputerVisionReporter:
                 'header': 'Результат (количество клеток)',
                 'sub_columns': [
                     {
-                        'header': 'Метод 1',
-                        'data_func': lambda data: data.get('method1_result')
+                        'header': 'OpenCV-метод',
+                        'data_func': lambda data: data.opencv_result
                     },
                     {
-                        'header': 'Метод 2',
-                        'data_func': lambda data: data.get('method2_result')
+                        'header': 'ML-метод',
+                        'data_func': lambda data: data.ml_result
                     },
                     {
-                        'header': 'Метод 3',
-                        'data_func': lambda data: data.get('method3_result')
+                        'header': 'CNN-метод',
+                        'data_func': lambda data: data.cnn_result
                     }
                 ]
             }
@@ -107,12 +109,12 @@ class ComputerVisionReporter:
         try:
             worksheet = self.workbook.add_sheet('Результаты эксперимента')
 
-            list_of_experiments = []
+            list_of_experiments = ExperimentReport.get_all()
 
             self.__write_xls_header_row(worksheet, self.experiment_columns)
 
             for row_index, experiment in enumerate(list_of_experiments):
-                self.__write_xls_data_row(worksheet, self.experiment_columns, row_index + 1, experiment)
+                self.__write_xls_data_row(worksheet, self.experiment_columns, row_index + 2, experiment)
 
         except Exception as exp:
             print(f'Ошибка в заполнении отчета по выполненным работам: {exp}')

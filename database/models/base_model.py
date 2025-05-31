@@ -15,7 +15,7 @@ class BaseModel(Base):
     mutex = threading.Lock()
 
     @classmethod
-    def create(cls, **kwargs) -> 'BaseModel' | None:
+    def create(cls, **kwargs):
         try:
             session = session_controller.get_session()
             object_new = cls(**kwargs)
@@ -58,13 +58,13 @@ class BaseModel(Base):
             return False
 
     @classmethod
-    def get_by_id(cls, object_id: int) -> 'BaseModel':
+    def get_by_id(cls, object_id: int):
         with cls.mutex:
             session = session_controller.get_session()
             return session.query(cls).get(object_id)
 
     @classmethod
-    def get_all(cls) -> 'list[BaseModel]':
+    def get_all(cls):
         with cls.mutex:
             session = session_controller.get_session()
             return session.query(cls).all()

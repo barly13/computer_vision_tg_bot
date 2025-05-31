@@ -12,13 +12,11 @@ main_router = Router()
 @main_router.message(Command('start'))
 async def main_menu_handler(message: Message, state: FSMContext):
     await message.answer(f'{Emoji.MainMenu} Главное меню', reply_markup=generate_inline_menu_kb())
-    await state.clear()
 
 
 @main_router.callback_query(F.data == 'main_menu')
 async def main_menu_second_handler(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(f'{Emoji.MainMenu} Главное меню', reply_markup=generate_inline_menu_kb())
-    await state.clear()
 
 
 @main_router.callback_query(F.data == 'help')
